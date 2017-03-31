@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Taco Tracker</title>
+        <link href="css/bootstrap/css/bootstrap.min.css" rel="stylesheet"></link>
+        <link href="css/bootstrap/css/bootstrap-theme.min.css" rel="stylesheet"></link>
+        <link href="css/main.css" rel="stylesheet"></link>
+    </head>
+    <body>
+        <div class="container">
+            <header class="row">
+                <div class="col-md-12 header"></div>
+            </header>
+            <main class="row">
+                <span class="search-container">
+                    <input class="search-filter" type="text" placeholder="Filter Search" data-bind="value: locationsSearch, valueUpdate: 'keyup'">
+                    <!-- <input class="filter" type="button" value="Filter" data-bind="click: searchLocations"> -->
+                </span>
+                <div class="col-md-12 center-block map" id="map"></div>
+                <div class="list-bar">
+                    <input class="show-list" type="button" value="Show List" data-bind="click: showList">
+                </div>
+                <div class="restaurants-list-container">
+                    <ul class="restaurants-list" data-bind="foreach: locations">
+                        <li data-bind="text: name, click: $parent.showInfo, visible: $parent.locationsSearch() === '' || name.includes($parent.locationsSearch())"></li>
+                    </ul>
+                </div>
+            </main>
+            <footer class="row">
+                <div class="col-md-12 footer"></div>
+            </footer>
+        </div>
+        <script src="js/knockout.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="js/google.js"></script>
+        <script src="js/app.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?libraries=places,geometry,drawing&key=AIzaSyClMpSbfFU97cINNKM2OmKL6Np8n1ny7kw&v=3&callback=initMap" onerror="googleFail()"></script>
+    </body>
+</html>
