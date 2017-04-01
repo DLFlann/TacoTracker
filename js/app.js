@@ -1,4 +1,4 @@
-// Array of all restaurants as objects with name, location, and Google id
+// Array of all restaurants as objects with name, location, Google id, and FourSquare id
 var restaurants = [
         {name: "Taco Shack", location: {lat: 30.2661039,lng: -97.7423323}, googleId: "ChIJCbBGIgi1RIYRmwFxbb30Ky8", foursquareId: "45f29bb2f964a520e0431fe3"},
         {name: "Pueblo Viejo", location: {lat: 30.263133,lng: -97.72592879999999}, googleId: "ChIJ-8dq9a-1RIYR9P-7JI7MRI8", foursquareId: "4cb890cb7148f04dacf5d0ab"},
@@ -22,35 +22,22 @@ var restaurants = [
         {name: "Joe's", location: {lat: 30.2611771,lng: -97.71666039999999}, googleId: "ChIJFXwBcsm1RIYRcIIjFUjKD2g", foursquareId: "4a6346e4f964a520a9c41fe3"},
     ];
 
-// Store FourSquare API URL, API version, and Mode
-var foursquareApiUrl = "https://api.foursquare.com/v2/venues/";
-var foursquareVersion = "20170331";
-var foursquareMode = "foursquare";
-
-// Store FourSquare App Id
-var foursquareAppId = "TB5PK10PDKPFXKDCVY0ZF3VBTG5FAY341GM1ZCPJKIDAWGUX";
-
-// Store FourSquare App Secret
-var foursquareSecret = "2TH1RSWXM0HQMXIMAGRPQYKAV1LLUTUAFXV2BEL5ZMX0XEEI";
-
-
 var ViewModel = function() {
     // Assign this to self variable for use unambiguous use
     var self = this;
 
     // Create an observable array for the restaurants locations model data
-    this.locations = ko.observableArray();
+    self.locations = ko.observableArray();
 
     // Create a Knockout observable to track user input in search field
-    this.locationsSearch = ko.observable("");
+    self.locationsSearch = ko.observable('');
 
     // Function to copy restaurant data into loctions observable array
     function copyRestaurants() {
         for (var i = 0; i < restaurants.length; i++) {
             var restaurant = {
                 name: restaurants[i].name,
-                // googleId: restaurants[i].googleId,
-                // foursquareId: restaurants[i].foursquareId
+                googleId: restaurants[i].googleId,
             };
             self.locations.push(restaurant);
         }
@@ -59,18 +46,18 @@ var ViewModel = function() {
     copyRestaurants();
 
     // Function opens locations list draw
-    this.showList = function() {
-        $(".restaurants-list-container").toggleClass("open");
+    self.showList = function() {
+        $('.restaurants-list-container').toggleClass('open');
     }
 
     // Function, finds marker for location and opens the info window at marker
-    this.showInfo = function(location) {
+    self.showInfo = function(location) {
         var marker;
 
         // Find marker with matching name, otherwise set animation to null to stop
         // any previously opened marker's animation
         for (var i = 0; i < markers.length; i++) {
-            if (location.name === markers[i].title) {
+            if (location.googleId === markers[i].googleId) {
                 marker = markers[i];
             } else {
                 markers[i].setAnimation(null);
@@ -79,7 +66,7 @@ var ViewModel = function() {
 
         // Set infowindow on marker, set marker animation and get restaurant details
         if (infowindow.marker === marker) {
-            console.log("This infowindow is already on this marker");
+            console.log('This infowindow is already on this marker');
         } else {
             marker.setAnimation(google.maps.Animation.BOUNCE);
             getPlaceDetails(marker, infowindow);
@@ -88,8 +75,7 @@ var ViewModel = function() {
     }
 
     // Creates an observable to remove filtered markers when data is entered in search
-    this.locationsSearch.subscribe(function(searchValue) {
-        // console.log("searching...");
+    self.locationsSearch.subscribe(function(searchValue) {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i].title.includes(searchValue) !== true) {
                 markers[i].setMap(null);
