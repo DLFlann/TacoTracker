@@ -79,11 +79,21 @@ function foursquareLikes (foursquareId) {
             "m": foursquareMode
         }
     }).done(function(object) {
-        // Append the number of FourSquare likes to the "likes" div in the infowindow
-        $('.likes').append('<strong>' + object.response.likes.summary + '</strong>');
+        // Add the number of Foursquare likes to the infowindow if available
+        if (object.response.likes.summary) {
+            var content = infowindow.getContent();
+            var likes = '<div class="likes"><strong>' + object.response.likes.summary + '</strong></div>';
+            infowindow.setContent(content + likes);
+        } else {
+            var content = infowindow.getContent();
+            var error ='<div class="likes"><strong>Sorry, we couldn\'t get the number of likes for this restaurant.</strong></div>';
+            infowindow.setContent(content + error);
+        }
     }).fail(function() {
         // Error case informs user that we are unable to get the number of likes if request fails
-        $('.likes').append('<strong>Sorry, we couldn\'t get the number of likes for this restaurant.</strong>');
+        var content = infowindow.getContent();
+        var error ='<div class="likes"><strong>Sorry, we couldn\'t get the number of likes for this restaurant.</strong></div>';
+        infowindow.setContent(content + error);
     });
 }
 
@@ -100,15 +110,41 @@ function foursquarePhotos (foursquareId) {
         }
     }).done(function(object) {
         // Loop through images returned and append each to the infowindow
-        var imgUrl;
-        for (var i = 0; i < object.response.photos.items.length; i++) {
-            imgUrl  = object.response.photos.items[i].prefix + 'height100' + object.response.photos.items[i].suffix;
-            $('.infoimages').append('<img src="' + imgUrl + '" style="display: inline;">');
+        if (object.response.photos.items.length >= 3) {
+            var checkLikes = setInterval(function() {
+                if ($('.likes').val() !== undefined) {
+                    var imgUrl;
+                    var content = infowindow.getContent();
+                    content += '<br><div class="infoimages" style="width: 100%; height: 100px; overflow: auto; white-space: nowrap;">';
+                    for (var i = 0; i < object.response.photos.items.length; i++) {
+                        imgUrl  = object.response.photos.items[i].prefix + 'height100' + object.response.photos.items[i].suffix;
+                        content += '<img src="' + imgUrl + '" style="display: inline;">';
+                    }
+                    content += '</div>';
+                    infowindow.setContent(content);
+                    clearInterval(checkLikes);
+                }
+            }, 100);
+        } else {
+            var checkLikes = setInterval(function() {
+                if ($('.likes').val() !== undefined) {
+                    var content = infowindow.getContent();
+                    var error = '<br><div class="infoimages"><strong>We couldn\'t load the images for this restaurant.</strong></div>';
+                    infowindow.setContent(content + error);
+                    clearInterval(checkLikes);
+                }
+            }, 100);
         }
     }).fail(function() {
         // Error case informs user that we are unable to display images if request fails
-        $('.infoimages').append('<strong>We couldn\'t load the images for this restaurant.</strong>');
-
+        var checkLikes = setInterval(function() {
+            if ($('.likes').val() !== undefined) {
+                var content = infowindow.getContent();
+                var error = '<br><div class="infoimages"><strong>We couldn\'t load the images for this restaurant.</strong></div>';
+                infowindow.setContent(content + error);
+                clearInterval(checkLikes);
+            }
+        }, 100);
     });
 }
 
@@ -125,13 +161,39 @@ function foursquareTips (foursquareId) {
         }
     }).done(function(object) {
         // Loop through the user tips returned and append each to the infowindow
-        for (var i = 0; i < 3; i++) {
-            $('.tips').append('<p style="padding: 5px; border-top: 1px solid #777;">' +
-                object.response.tips.items[i].text + '</p>');
+        if (object.response.tips.items.length >= 3) {
+            var checkPics = setInterval(function() {
+                if ($('.infoimages').val() !== undefined) {
+                    var content = infowindow.getContent();
+                    content += '<br><div class="tips">';
+                    for (var i = 0; i < 3; i++) {
+                      content += '<p style="padding: 5px; border-top: 1px solid #777;">' + object.response.tips.items[i].text + '</p>';
+                    }
+                    content += '</div></div>';
+                    infowindow.setContent(content);
+                    clearInterval(checkPics);
+                }
+            }, 300);
+        } else {
+            var checkPics = setInterval(function() {
+                if ($('.infoimages').val() !== undefined) {
+                    var content = infowindow.getContent();
+                    error = '<br><div class="tips"><strong>Sorry, we couldn\'t get the tips and advice for this restaurant.</strong></div></div>';
+                    infowindow.setContent(content + error);
+                    clearInterval(checkPics);
+                }
+            }, 300);
         }
     }).fail(function() {
         // Error case informs user that we are unable to display tips if request fails
-        $('.tips').append('<strong>Sorry, we couldn\'t get the tips and advice for this restaurant.</strong>');
+        var checkPics = setInterval(function() {
+            if ($('.infoimages').val() !== undefined) {
+                var content = infowindow.getContent();
+                error = '<br><div class="tips"><strong>Sorry, we couldn\'t get the tips and advice for this restaurant.</strong></div></div>';
+                infowindow.setContent(content + error);
+                clearInterval(checkPics);
+            }
+        }, 300);
     });
 }
 
@@ -154,6 +216,7 @@ function getPlaceDetails(marker, infowindow) {
             foursquarePhotos(marker.foursquareId);
             foursquareTips(marker.foursquareId);
 
+            // Create infowindow content
             if (place.name) {
             innerHTML += '<strong>' + place.name + '</strong>';
             }
@@ -173,18 +236,27 @@ function getPlaceDetails(marker, infowindow) {
                 place.opening_hours.weekday_text[5] + '<br>' +
                 place.opening_hours.weekday_text[6];
             }
-            innerHTML += '<br><br><br><img src="images/Powered-by-Foursquare.png">'
-            innerHTML += '<div class="likes"></div>';
-            innerHTML += '<br><div class="infoimages" style="width: 100%; height: 100px; overflow: auto; white-space: nowrap;"></div>';
-            innerHTML += '<br><div class="tips"></div>';
-            innerHTML += '</div>';
+            innerHTML += '<br><br><br><img src="images/Powered-by-Foursquare.png">';
             infowindow.setContent(innerHTML);
+            // Open infowindow
             infowindow.open(map, marker);
             // Clear marker property if info window is closed.
             infowindow.addListener('closeclick', function() {
                 marker.setAnimation(null);
                 infowindow.marker = null;
             });
+        } else {
+              // Set marker property on this infowindow
+              infowindow.marker = marker;
+              // Set infowindow error message
+              infowindow.setContent('<div><p>Sorry, we Google is unable to load data for this location</p></div>');
+              // Open infowindow
+              infowindow.open(map, marker);
+              // Clear marker property if info window is closed.
+              infowindow.addListener('closeclick', function() {
+                  marker.setAnimation(null);
+                  infowindow.marker = null;
+              });
         }
     });
 }

@@ -41,14 +41,14 @@ var ViewModel = function() {
             };
             self.locations.push(restaurant);
         }
-    };
+    }
     // Run previously defined function, copy restaurant data to observable array
     copyRestaurants();
 
     // Function opens locations list draw
     self.showList = function() {
         $('.restaurants-list-container').toggleClass('open');
-    }
+    };
 
     // Function, finds marker for location and opens the info window at marker
     self.showInfo = function(location) {
@@ -72,7 +72,7 @@ var ViewModel = function() {
             getPlaceDetails(marker, infowindow);
             self.showList();
         }
-    }
+    };
 
     // Creates an observable to remove filtered markers when data is entered in search
     self.locationsSearch.subscribe(function(searchValue) {

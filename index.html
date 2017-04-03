@@ -12,22 +12,22 @@
     </head>
     <body>
         <div class="container-fluid">
-            <div class="row">
-                <span class="col-md-4 search-container">
+            <main class="row">
+                <section class="col-md-4 search-container">
                     <input class="search-filter" type="text" placeholder="Filter Search" data-bind="value: locationsSearch, valueUpdate: 'keyup'">
-                </span>
-                <div class="col-md-9 map" id="map"></div>
-                <div class="col-md-12 list-bar">
+                </section>
+                <section class="col-md-9 map" id="map"></section>
+                <section class="col-md-12 list-bar">
                     <input class="show-list" type="button" value="Show List" data-bind="click: showList">
-                </div>
-                <div class="col-md-3 restaurants-list-container">
+                </section>
+                <section class="col-md-3 restaurants-list-container">
                     <div class="ul-contain">
                         <ul class="restaurants-list" data-bind="foreach: locations">
                             <li data-bind="text: name, click: $parent.showInfo, visible: $parent.locationsSearch() === '' || name.includes($parent.locationsSearch())"></li>
                         </ul>
                     </div>
-                </div>
-            </div>
+                </section>
+            </main>
         </div>
         <script src="js/knockout.js"></script>
         <script src="js/google.js"></script>
